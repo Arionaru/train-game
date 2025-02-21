@@ -86,7 +86,7 @@ export class GameMap {
         const treeY = tree.cellY;
         let trainX = Math.floor(this.train.lastPosition.x / CELL_SIZE);
         let trainY = Math.floor(this.train.lastPosition.y / CELL_SIZE);
-        // console.log('tree ', treeX, treeY)
+        console.log('tree ', treeX, treeY)
         // console.log('train', trainX, trainY)
         console.log('-------')
 
@@ -97,10 +97,8 @@ export class GameMap {
             if (this.currentMap[treeY][checkX] === 0 || this.currentMap[treeY][checkX] === -1) {
                 this.currentMap[treeY][checkX] = -1;
                 this.currentMap[treeY][treeX] = -1;
-
                 this.deleteRedundantRailsY(treeY);
                 this.generateMap();
-
                 this.positionIndex = this.path.findIndex((el) => el.x === this.train.lastPosition.x
                     && el.y === this.train.lastPosition.y);
             }
@@ -118,48 +116,59 @@ export class GameMap {
     }
 
     deleteRedundantRailsX(treeX) {
-        let neighborCount = 0;
+        let neighborsY = [];
         for (let y = 0; y < this.currentMap.length; y++) {
             if (this.currentMap[y][treeX] === -1) {
-                neighborCount++;
+                neighborsY.push(y);
             } else {
-                neighborCount = 0;
+                neighborsY = []
             }
-            if (neighborCount > 2) {
-                if (this.train.direction === 'd') {
-                    this.checkForDeleteAndFindNewPath(treeX-1, y-1);
-                } else if (this.train.direction === 'u') {
-                    this.checkForDeleteAndFindNewPath(treeX+1, y+1);
+            if (neighborsY.length > 2) {
+                console.log(neighborsY)
+                for (let xx = 0; xx < neighborsY.length; xx++) {
+                    if (this.train.direction === 'd') {
+                        this.checkForDeleteAndFindNewPath(treeX-1, neighborsY[xx]-1);
+                    } else if (this.train.direction === 'u') {
+                        this.checkForDeleteAndFindNewPath(treeX+1, neighborsY[xx]+1);
+                    }
                 }
+
             }
         }
     }
 
     deleteRedundantRailsY(treeY) {
-        let neighborCount = 0;
+        let neighborsX = [];
         for (let x = 0; x < this.currentMap[treeY].length; x++) {
             if (this.currentMap[treeY][x] === -1) {
-                neighborCount++;
+                neighborsX.push(x);
             } else {
-                neighborCount = 0;
+                neighborsX = [];
             }
-            if (neighborCount > 2) {
-                if (this.train.direction === 'r') {
-                    this.checkForDeleteAndFindNewPath(x-1, treeY+1);
-                } else if (this.train.direction === 'l') {
-                    this.checkForDeleteAndFindNewPath(x+1, treeY-1);
+            if (neighborsX.length > 2) {
+                console.log(neighborsX)
+                for (let xx = 0; xx < neighborsX.length; xx++) {
+                    if (this.train.direction === 'r') {
+                        this.checkForDeleteAndFindNewPath(neighborsX[xx]-1, treeY+1);
+                    } else if (this.train.direction === 'l') {
+                        this.checkForDeleteAndFindNewPath(neighborsX[xx]+1, treeY-1);
+                    }
                 }
+
             }
         }
     }
 
     checkForDeleteAndFindNewPath(x, y) {
         const originalEl = this.currentMap[y][x];
+        console.log('check coords',x,y)
         this.currentMap[y][x] = -2;
         const newPath = this.findRailsPath();
         if (newPath === null) {
+            console.log('new path not set ', x, y )
             this.currentMap[y][x] = originalEl;
         } else {
+            console.log('new path set ', x, y )
             this.path = newPath;
         }
     }
@@ -203,7 +212,7 @@ export class GameMap {
 
             if (visited.has(key)) break; // Если вернулись в начало — выход
             visited.add(key);
-            console.log(key)
+            // console.log(key)
 
             // Добавляем в путь
             path.push({x: col * 25 + 12.5, y: row * 25 + 12.5});
@@ -230,12 +239,20 @@ export class GameMap {
         }
 
         if (this.path > path) {
-            console.log(this.path)
-            console.log(path)
+            // console.log(this.currentMap)
+            // console.log(this.path)
+            // console.log(path)
             return null;
         }
 
-        return path;
+        //проверка на то, что путь замыкается
+        if (path[0].x === path[path.length-1].x ||
+            path[0].y === path[path.length-1].y) {
+            return path;
+        }
+
+
+        return null;
     }
 
     moveTrain(isMoving) {
