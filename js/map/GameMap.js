@@ -18,7 +18,6 @@ export class GameMap {
     }
 
     generateMap(drawTrees = false) {
-        //console.log(this.currentMap)
 
         for (let y = 0; y < this.currentMap.length; y++) {
             for (let x = 0; x < this.currentMap[y].length; x++) {
@@ -86,38 +85,25 @@ export class GameMap {
 
     removeTreeAndExpandRails(tree) {
         // Убираем дерево, превращаем в пустую клетку (0)
-        const treeX = tree.cellX;
-        const treeY = tree.cellY;
-        let trainX = Math.floor(this.train.lastPosition.x / CELL_SIZE);
-        let trainY = Math.floor(this.train.lastPosition.y / CELL_SIZE);
-        console.log('tree ', treeX, treeY)
-        // console.log('train', trainX, trainY)
-        console.log('-------')
 
-        this.currentMap[treeY][treeX] = 0;
+        this.currentMap[tree.cellY][tree.cellX] = 0;
         let newPath = this.findRailsPath();
         if (newPath !== null) {
-            console.log('path found', newPath )
             this.path = newPath;
             this.generateMap();
             this.positionIndex = this.path.findIndex((el) => el.x === this.train.lastPosition.x
                 && el.y === this.train.lastPosition.y);
-        } else {
-            console.log('no path!')
         }
-
     }
 
     findRailsPath() {
         let path = [];
         let directions = [
-            {dx: 0, dy: -1, direction: 'u'}, // Вверх
-            {dx: 1, dy: 0, direction: 'r'},  // Вправо
-            {dx: 0, dy: 1, direction: 'd'},  // Вниз
-            {dx: -1, dy: 0, direction: 'l'}  // Влево
+            {dx:  0, dy: -1, direction: 'u'}, // Вверх
+            {dx:  1, dy:  0, direction: 'r'},  // Вправо
+            {dx:  0, dy:  1, direction: 'd'},  // Вниз
+            {dx: -1, dy:  0, direction: 'l'}  // Влево
         ];
-
-
 
         // Найти начальную точку (верхний левый угол рельсов)
         let start = null;
@@ -136,8 +122,6 @@ export class GameMap {
             }
             if (start) break;
         }
-
-        if (!start) return [];
 
         let current = start;
         let visited = new Set();
@@ -184,23 +168,12 @@ export class GameMap {
             current = next;
         }
 
-        // if (this.path > path) {
-        //     // console.log(this.currentMap)
-        //     // console.log(this.path)
-        //     // console.log(path)
-        //     return null;
-        // }
-
         //проверка на то, что путь замыкается
-        console.log(path[0].y, path[path.length-1].y, path[0].y === path[path.length-1].y)
-
         if (path[0].x === path[path.length-1].x ||
             path[0].y === path[path.length-1].y) {
             this.checkRailsForDelete(path);
             return path;
         }
-        console.log(path)
-
 
         return null;
     }

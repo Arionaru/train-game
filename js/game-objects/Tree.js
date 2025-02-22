@@ -10,11 +10,6 @@ export class Tree {
         this.y = cellY * cellSize + cellSize / 2;
 
         this.sprite = scene.physics.add.sprite(this.x, this.y, 'tree').setScale(0.05);
-        const text = scene.add.text(this.x, this.y, cellX, {
-            fontSize: '12px',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
         this.hp = 2;
         this.isDamaged = false;
     }
