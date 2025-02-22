@@ -35,6 +35,7 @@ export class GameMap {
                     const existRails = this.rails.get(posX + '' + posY);
                     if (existRails !== undefined) {
                         existRails.setAlpha(0);
+                        this.rails.delete(posX + '' + posY)
                     }
                 }
             }
