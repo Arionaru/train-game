@@ -3,7 +3,7 @@ export class Train {
         this.scene = scene;
         this.currentMap = currentMap;
         this.trainPosition = this.findTrainStartPosition();
-        this.trainImage = this.scene.physics.add.sprite(this.trainPosition.x, this.trainPosition.y, 'train').setScale(0.05);
+        this.trainImage = this.scene.physics.add.sprite(this.trainPosition.x, this.trainPosition.y, 'train').setScale(0.05).setDepth(10);
         this.trainImage.angle = 180;
         this.lastPosition =  { x: this.trainImage.x, y: this.trainImage.y };
         this.direction = 'r';
