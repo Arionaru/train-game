@@ -1,5 +1,6 @@
 import {Tree} from "../game-objects/Tree.js";
 import {Train} from "../game-objects/Train.js";
+import {Rails} from "../game-objects/Rails.js";
 
 export const CELL_SIZE = 25;
 
@@ -8,17 +9,17 @@ export class GameMap {
         this.currentMap = map.map(row => [...row]);
         this.scene = scene;
         this.trees = [];
-        this.rails = new Map();
+        this.rails = new Rails(scene, this.currentMap);
         this.generateMap(true);
         this.train = new Train(scene, this.currentMap);
         this.path = this.findRailsPath();
         this.positionIndex = 0; // Текущая позиция в пути
         this.speed = 200; // Скорость поезда в пикселях в секунду
         this.moveTween = null; // Переменная для хранения текущего движения
+
     }
 
     generateMap(drawTrees = false) {
-
         for (let y = 0; y < this.currentMap.length; y++) {
             for (let x = 0; x < this.currentMap[y].length; x++) {
                 let posX = x * CELL_SIZE + CELL_SIZE / 2;
@@ -27,61 +28,22 @@ export class GameMap {
                 if (this.currentMap[y][x] === 1 && drawTrees) {
                     this.trees.push(new Tree(this.scene, x, y, CELL_SIZE)); // Дерево
                 } else if (this.currentMap[y][x] === -1 || this.currentMap[y][x] === 0) {
-                    const existRails = this.rails.get(posX + '' + posY);
+                    const existRails = this.rails.railsMap.get(posX + '' + posY);
                     if (existRails === undefined) {
-                        this.addRails(x, y, posX, posY);
+                        this.rails.addRails(x, y, posX, posY);
                     }
                 } else if (this.currentMap[y][x] === -2) {
-                    const existRails = this.rails.get(posX + '' + posY);
+                    const existRails = this.rails.railsMap.get(posX + '' + posY);
                     if (existRails !== undefined) {
                         existRails.setAlpha(0);
-                        this.rails.delete(posX + '' + posY)
+                        this.rails.railsMap.delete(posX + '' + posY)
                     }
                 }
             }
         }
     }
 
-    addRails(x, y, posX, posY) {
-        // Проверка соседей для рельс
-        let isHorizontal = false;
-        let isVertical = false;
-        let isTop = false;
-        let isBottom = false;
-        let isLeft = false;
-        let isRight = false;
-
-        // Проверяем соседей
-        if (x + 1 < this.currentMap[y].length && this.currentMap[y][x + 1] === -1) isRight = true;
-        if (x - 1 >= 0 && this.currentMap[y][x - 1] === -1) isLeft = true;
-        if (y + 1 < this.currentMap.length && this.currentMap[y + 1][x] === -1) isBottom = true;
-        if (y - 1 >= 0 && this.currentMap[y - 1][x] === -1) isTop = true;
-
-        // Определяем тип рельс: горизонтальные, вертикальные, угловые
-        if (isRight || isLeft) {
-            isHorizontal = true;
-        }
-
-        if (isBottom || isTop) {
-            isVertical = true;
-        }
-
-        if (isTop && isRight) {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(2).setScale(0.5).setAngle(180));
-        } else if (isTop && isLeft) {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(2).setScale(0.5).setAngle(90));
-        } else if (isBottom && isRight) {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(2).setScale(0.5).setAngle(270));
-        } else if (isBottom && isLeft) {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(2).setScale(0.5).setAngle(0));
-        } else if (isHorizontal) {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(1).setScale(0.5)); // Горизонтальные рельсы
-        } else if (isVertical) {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(0).setScale(0.5)); // Вертикальные рельсы
-        } else {
-            this.rails.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(0).setScale(0.5)); // Вертикальные рельсы
-        }
-    }
+    
 
     removeTreeAndExpandRails(tree) {
         // Убираем дерево, превращаем в пустую клетку (0)
@@ -180,10 +142,10 @@ export class GameMap {
 
     checkRailsForDelete(path) {
         let pathKeys = new Set(path.map(el => el.x + '' + el.y));
-        this.rails.forEach((el, key) => {
+        this.rails.railsMap.forEach((el, key) => {
             if (!pathKeys.has(key)) {
                 el.setAlpha(0);
-                this.rails.delete(key);
+                this.rails.railsMap.delete(key);
                 let x = Math.floor(el.x / CELL_SIZE);
                 let y = Math.floor(el.y / CELL_SIZE);
                 this.currentMap[y][x] = -2;
