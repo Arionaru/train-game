@@ -28,6 +28,7 @@ export class GameMap {
                 if (this.currentMap[y][x] === 1 && drawTrees) {
                     this.trees.push(new Tree(this.scene, x, y, CELL_SIZE)); // Дерево
                 } else if (this.currentMap[y][x] === -1 || this.currentMap[y][x] === 0) {
+                    this.currentMap[y][x] = -1;
                     const existRails = this.rails.railsMap.get(posX + '' + posY);
                     if (existRails === undefined) {
                         this.rails.addRails(x, y, posX, posY);
@@ -35,7 +36,7 @@ export class GameMap {
                 } else if (this.currentMap[y][x] === -2) {
                     const existRails = this.rails.railsMap.get(posX + '' + posY);
                     if (existRails !== undefined) {
-                        existRails.setAlpha(0);
+                        existRails.destroy();
                         this.rails.railsMap.delete(posX + '' + posY)
                     }
                 }
@@ -142,7 +143,7 @@ export class GameMap {
         let pathKeys = new Set(path.map(el => el.x + '' + el.y));
         this.rails.railsMap.forEach((el, key) => {
             if (!pathKeys.has(key)) {
-                el.setAlpha(0);
+                el.destroy();
                 this.rails.railsMap.delete(key);
                 let x = Math.floor(el.x / CELL_SIZE);
                 let y = Math.floor(el.y / CELL_SIZE);

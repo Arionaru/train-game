@@ -62,9 +62,15 @@ function create() {
     this.input.keyboard.on('keyup-SPACE', function () {
         isMoving = false; // Поезд останавливается
     });
+
+    // this.events.on('postupdate', () => {
+    //     console.log('Rendered objects:', this.children.list.length);
+    // });
 }
 
 function update() {
+    // console.log('Total Sprites:', this.children.list.filter(obj => obj instanceof Phaser.GameObjects.Sprite).length);
+    // console.log('Physics bodies:', this.physics.world.bodies.entries.length);
 }
 
 new Phaser.Game(config);

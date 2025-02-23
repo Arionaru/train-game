@@ -44,7 +44,7 @@ export class Tree {
         });
 
         if (this.hp <= 0) {
-            this.sprite.setAlpha(0);
+            this.sprite.destroy();
         }
     }
 

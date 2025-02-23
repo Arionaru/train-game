@@ -42,8 +42,12 @@ export class Rails {
             this.railsMap.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(1).setScale(0.5)); // Горизонтальные рельсы
         } else if (isVertical) {
             this.railsMap.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(0).setScale(0.5)); // Вертикальные рельсы
-        } else {
-            this.railsMap.set(posX + '' + posY, this.scene.add.sprite(posX, posY, 'rails').setFrame(0).setScale(0.5)); // Вертикальные рельсы
         }
+        this.checkNeighbours();
     }
+
+    checkNeighbours(x, y, posX, posY) {
+
+    }
+
 }
