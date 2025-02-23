@@ -1,6 +1,6 @@
 export class Rails {
 
-    constructor(scene, currentMap, railsMap) {
+    constructor(scene, currentMap) {
         this.currentMap = currentMap;
         this.railsMap = new Map();
         this.scene = scene;
