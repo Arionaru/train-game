@@ -43,8 +43,6 @@ export class GameMap {
         }
     }
 
-    
-
     removeTreeAndExpandRails(tree) {
         // Убираем дерево, превращаем в пустую клетку (0)
 
